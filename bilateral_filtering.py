@@ -138,10 +138,10 @@ def bilateral_filter(depth, config, discontinuity_map=None, HR=False, mask=None,
         pad_mask = np.pad(mask, (midpt,midpt), 'constant')
         pad_mask_patches = rolling_window(pad_mask, [window_size, window_size], [1,1])
     from itertools import product
-    if discontinuity_map is not None:
-        pH, pW = pad_depth_patches.shape[:2]
-        for pi in range(pH):
-            for pj in range(pW):
+    pH, pW = pad_depth_patches.shape[:2]
+    for pi in range(pH):
+        for pj in range(pW):
+            if discontinuity_map is not None:
                 if mask is not None and mask[pi, pj] == 0:
                     continue
                 if discontinuity_map is not None:
@@ -170,10 +170,7 @@ def bilateral_filter(depth, config, discontinuity_map=None, HR=False, mask=None,
                     cum_coef = np.cumsum(coef_order)
                     ind = np.digitize(0.5, cum_coef)
                     output[pi, pj] = depth_patch.ravel()[depth_order][ind]
-    else:
-        pH, pW = pad_depth_patches.shape[:2]
-        for pi in range(pH):
-            for pj in range(pW):
+            else:
                 if discontinuity_map is not None:
                     if pad_discontinuity_patches[pi, pj][window_size//2, window_size//2] == 1:
                         continue
